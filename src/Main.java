@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 import com.comsol.model.*; 
 import com.comsol.model.util.*;
 
@@ -12,66 +14,40 @@ public class Main {
    }
    
    public static void run() {
+	   System.out.println("Starting program");
        ModelUtil.connect(serverAddress, serverPort);
+       // generare model cu nume unic
+       Model model = ModelUtil.create(Long.toString(System.currentTimeMillis()) + "MetalDetect" + ".mph");
+       ModelNode component = model.component().create("ModelFizic");
+       GeomSequence geometry = component.geom().create("Geometria", 3);
        
-       Coil primaryCoil = new Coil("primary", 1.0, 1.0, 1.0, 1.0, 0.1);
        
-       MetalDetector detector = new MetalDetector();
-       detector.CreateCoilGeometry();
-       detector.saveModel();
+       // Creare componente generale
+       Coil primaryCoil = new Coil("Primary", 0, 0, 0, 3.0, 0.1);
+       Coil secondaryCoil = new Coil("Secondary", 1, 1, 1, 1.0, 0.1);
+       
+       MetalDetector detector = new MetalDetector(component, geometry);
+       detector.SetPrimaryCoil(primaryCoil);
+       detector.SetSecondaryCoil(secondaryCoil);
+       
+       detector.CreateCoilGeometry(); // O sa adauge bobinele la geometria modelului
+       // todo: adaugare materiale si fizica pentru "Coils"
+       // detector.AssignMaterials();
+       // detector.CreateCoilPhysics();
+       
+       try {
+    	   model.save(Long.toString(System.currentTimeMillis()) + "_MetalDetect" + ".mph");
+       } catch(IOException e) {
+    	   e.printStackTrace();
+       }
+       ModelUtil.disconnect();
+       System.out.println("Done");
    }
    
-   /*
-   public static void run() {
-	   try {
-	   // Connect to COMSOL Server
-       String serverAddress = "localhost";
-       int serverPort = 2036;
-       ModelUtil.connect(serverAddress, serverPort);
-
-       // Create a COMSOL model on the server
-       Model model = ModelUtil.create("Model3");
-       System.out.println("Created model");
-
-       // Define the geometry
-       model.geom().create("geom1", 3);
-       model.geom("geom1").feature().create("blk1", "Block");
-       model.geom("geom1").feature("blk1").set("size", new String[]{"0.1", "0.2", "0.5"});
-
-       // Create a physics (e.g., Heat Transfer)
-       model.physics().create("ht", "HeatTransfer", "geom1");
-
-       
-       // Create a study (e.g., Stationary study)
-       model.study().create("std");
-       model.study("std").feature().create("stat", "Stationary");
-
-       
-       // Solve the model on the server
-       model.sol().create("sol1");
-       model.study("std").feature("stat").set("initstudyhide", "on");
-       model.study("std").feature("stat").set("initsolhide", "on");
-       model.study("std").feature("stat").set("solnumhide", "on");
-       model.study("std").feature("stat").set("notsolnumhide", "on");
-       
-       System.out.println("Running simulation");
-       // Run the simulation
-       // model.sol("sol1").run(); // am comentat deoarece mai trebuiesc setari
-       
-       model.save("Model2.mph");
-       model.save("Model3.mph");
-      
-
-       // Disconnect from COMSOL Server
-       ModelUtil.disconnect();
-	   } catch(Exception e) {
-		   System.out.println("Caught exception");
-		   e.printStackTrace();
-		   ModelUtil.disconnect();
-	   }
+   // temporar - inlocuire
+   private static void ModelCreateGeometry(MetalDetector detector, MetalObject object, double BoundaryRadius) {
 	   
-       System.out.println("Done");
-   } 
-   */
+   }
+   
    
 }

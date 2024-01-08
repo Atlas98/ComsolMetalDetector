@@ -5,53 +5,39 @@ import com.comsol.model.util.*;
 import com.gmail.sorin9812.*;
 
 public class MetalDetector {
-	Model model; // comsol model file
-	
-	// input information
-	Coil primaryCoil = new Coil();
-	Coil secondaryCoil = new Coil();
-	
-	// output info
-	float inductance; // in mH -- static conditions
-
+	// Variable specifice COMSOL pentru a manipula modelul
+	ModelNode component;
+	GeomSequence geometry;
 	
 	
-	public MetalDetector() {
-		this.model = ModelUtil.create(Long.toString(System.currentTimeMillis()) + Integer.toString(this.hashCode()) + ".mph");
+	Coil primaryCoil;
+	Coil secondaryCoil;
+	
+	
+	
+	public MetalDetector(ModelNode componentNode, GeomSequence geometryNode) {
+		this.component = componentNode; // atribuire componenta pentru a putea adauga fizica bobinelor si materialele
+		this.geometry = geometryNode;	// atribuire geometrie
 	}
 	
 	
-	// Assign primary coil object
+	
 	public void SetPrimaryCoil(Coil coil) {
 		this.primaryCoil = coil;
-		this.primaryCoil.parentModel = model;
 	}
-	// Assign secondary coil object
+	
 	public void SetSecondaryCoil(Coil coil) {
 		this.secondaryCoil = coil;
 	}
 	
 	
-	// builds the geometry with the available coil data;
+	
 	public void CreateCoilGeometry() {
-		model.component().create("PrimaryCoilComponent");
-		GeomSequence primaryCoil = model.component("PrimaryCoilComponent").geom().create("primaryGeom", 3);
-		GeomFeature torusFeature = primaryCoil.create("torusFeature", "Torus");
+		this.primaryCoil.AppendGeometry(geometry);
+		this.secondaryCoil.AppendGeometry(geometry);
 		
-		torusFeature.set("pos", new double[] {1.0, 1.0, 1.0});
-		torusFeature.set("rmaj", 1);
-		torusFeature.set("rmin", 0.1);
-		
-		
+		geometry.run(); // o sa mut de aici, intentia este sa fie run dupa ce toate obiectele sunt introduse in model
 	}
 	
-	
-	public void saveModel() {
-		try {
-			model.save("MetalDetector.mph");
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
 	
 } // class
