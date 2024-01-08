@@ -22,18 +22,18 @@ public class Main {
        GeomSequence geometry = component.geom().create("Geometria", 3);
        
        
+       
        // Creare componente generale
        Coil primaryCoil = new Coil("Primary", 0, 0, 0, 3.0, 0.1);
        Coil secondaryCoil = new Coil("Secondary", 1, 1, 1, 1.0, 0.1);
        
-       MetalDetector detector = new MetalDetector(component, geometry);
-       detector.SetPrimaryCoil(primaryCoil);
-       detector.SetSecondaryCoil(secondaryCoil);
        
-       detector.CreateCoilGeometry(); // O sa adauge bobinele la geometria modelului
-       // todo: adaugare materiale si fizica pentru "Coils"
-       // detector.AssignMaterials();
-       // detector.CreateCoilPhysics();
+       IGeometryComponent[] geometryObjects = { primaryCoil, secondaryCoil };
+       Main.ModelCreateGeometry(geometry, geometryObjects );
+
+       
+       
+       
        
        try {
     	   model.save(Long.toString(System.currentTimeMillis()) + "_MetalDetect" + ".mph");
@@ -45,8 +45,12 @@ public class Main {
    }
    
    // temporar - inlocuire
-   private static void ModelCreateGeometry(MetalDetector detector, MetalObject object, double BoundaryRadius) {
+   private static void ModelCreateGeometry(GeomSequence geometry, IGeometryComponent[] geometries) {
+	   for(IGeometryComponent geometryComponent : geometries) {
+		   geometryComponent.AppendGeometry(geometry);
+	   }
 	   
+	   geometry.run(); // Aici se construieste geometria cu toate componentele adaugate
    }
    
    

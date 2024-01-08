@@ -4,7 +4,7 @@ import com.comsol.model.*;
 import com.comsol.model.util.*;
 
 
-public class Coil {
+public class Coil implements IGeometryComponent {
 	Model parentModel; // the parent model file of this coil
 	
 	// Coil data -- unique id
