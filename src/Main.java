@@ -4,6 +4,10 @@ import com.comsol.model.*;
 import com.comsol.model.util.*;
 
 import com.gmail.sorin9812.*;
+import com.gmail.sorin9812.Materials.AirMaterial;
+import com.gmail.sorin9812.Materials.AluminiumMaterial;
+import com.gmail.sorin9812.Materials.CopperMaterial;
+import com.gmail.sorin9812.Materials.IronMaterial;
 
 public class Main {
 	private static String serverAddress = "localhost";
@@ -13,7 +17,8 @@ public class Main {
       run(); 
    }
    
-   public static void run() {
+   @SuppressWarnings("deprecation")
+public static void run() {
 	   System.out.println("Starting program");
        ModelUtil.connect(serverAddress, serverPort);
        // generare model cu nume unic
@@ -21,17 +26,30 @@ public class Main {
        ModelNode component = model.component().create("ModelFizic");
        GeomSequence geometry = component.geom().create("Geometria", 3);
        
-       
+       //Material material = component.material().create("AirMaterial");
+       //material.name("Copper");
        
        // Creare componente generale
-       Coil primaryCoil = new Coil("Primary", 0, 0, 0, 3.0, 0.1);
-       Coil secondaryCoil = new Coil("Secondary", 1, 1, 1, 1.0, 0.1);
+       IGeometryComponent primaryCoil = new Coil("Primary", 0, 0, 0, 0.1, 0.001);
+       IGeometryComponent secondaryCoil = new Coil("Secondary", 0, 0, 0.2, 0.01, 0.001);
+       IGeometryComponent boundary = new BoundarySphere("Boundary", 1.0);
+       IGeometryComponent target = new MetalObject("MetalObj", 0.1).SetPosition(0,  0,  0.5);
+       
+       Material airMat = AirMaterial.CreateAtNode(component);
+       Material copperMat = CopperMaterial.CreateAtNode(component);
+       Material aluminiumMat = AluminiumMaterial.CreateAtNode(component);
+       Material ironMat = IronMaterial.CreateAtNode(component);
        
        
-       IGeometryComponent[] geometryObjects = { primaryCoil, secondaryCoil };
+
+       System.out.println("Creating geometry");
+       IGeometryComponent[] geometryObjects = { primaryCoil, secondaryCoil, boundary, target};
        Main.ModelCreateGeometry(geometry, geometryObjects );
 
        
+       // assigning materials
+       boundary.AssignMaterial(null, airMat);
+
        
        
        
@@ -50,7 +68,7 @@ public class Main {
 		   geometryComponent.AppendGeometry(geometry);
 	   }
 	   
-	   geometry.run(); // Aici se construieste geometria cu toate componentele adaugate
+	   //geometry.run(); // Aici se construieste geometria cu toate componentele adaugate
    }
    
    
