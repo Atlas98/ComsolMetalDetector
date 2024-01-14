@@ -30,8 +30,8 @@ public static void run() {
        //material.name("Copper");
        
        // Creare componente generale
-       IGeometryComponent primaryCoil = new Coil("Primary", 0, 0, 0, 0.1, 0.001);
-       IGeometryComponent secondaryCoil = new Coil("Secondary", 0, 0, 0.2, 0.01, 0.001);
+       IGeometryComponent primaryCoil = new Coil("Primary", 0, 0, 0, 0.11, 0.001);
+       IGeometryComponent secondaryCoil = new Coil("Secondary", 0, 0, 0.1, 0.1, 0.001);
        IGeometryComponent boundary = new BoundarySphere("Boundary", 1.0);
        IGeometryComponent target = new MetalObject("MetalObj", 0.1).SetPosition(0,  0,  0.5);
        
@@ -48,8 +48,9 @@ public static void run() {
 
        
        // assigning materials
-       boundary.AssignMaterial(null, airMat);
-
+       ModelAssignMaterial(airMat, new int[] {1}); // assign to boundary sphere
+       ModelAssignMaterial(copperMat, new int[]{2,3}); // assign to primary and secondary coil
+       ModelAssignMaterial(aluminiumMat, new int[] {4}); // assign to metal object
        
        
        
@@ -68,8 +69,11 @@ public static void run() {
 		   geometryComponent.AppendGeometry(geometry);
 	   }
 	   
-	   //geometry.run(); // Aici se construieste geometria cu toate componentele adaugate
-   }
+	   geometry.run(); // Aici se construieste geometria cu toate componentele adaugate
+   } // Model Create Geometry
    
+   private static void ModelAssignMaterial(Material material, int[] selection) {
+	   material.selection().set(selection);
+   }
    
 }

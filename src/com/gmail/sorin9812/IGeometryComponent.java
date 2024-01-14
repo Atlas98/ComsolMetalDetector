@@ -32,6 +32,7 @@ public abstract class IGeometryComponent {
 	}
 	
 	public void AssignMaterial(GeomFeature feature, Material material) {
+		
 		//feature.getInt(name)
 		//material.selection().set(null);
 	}
